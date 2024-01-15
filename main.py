@@ -5,6 +5,7 @@ from genetics.genetics import *
 
 from time import time
 
+PRINT_GENERATIONS = True
 
 def read_file(path: str) -> tuple[list, list[Lesson]]:
     lessons: list[Lesson] = []
@@ -19,25 +20,53 @@ def read_file(path: str) -> tuple[list, list[Lesson]]:
     return classrooms, lessons
 
 
+def print_all_stats(population: list[Schedule]) -> None:
+    i: int = 0
+    score_sum: int = 0
+    same: int = 0
+    score = optimal_criterion(population[0])
+    for chromosome in population:
+        prev_score, score = score, optimal_criterion(chromosome)
+        if score != prev_score:
+            if same != 1:
+                print(f"Chromosome:[{i-same}-{i-1}] Score:{score}")
+            else:
+                print(f"Chromosome: {i-1}      Score:{score}")
+            same = 1
+        else:
+            same += 1
+        score_sum += score
+        i += 1
+    if same != 1:
+        print(f"Chromosome:[{i-same}-{i-1}] Score:{score}")
+    else:
+        print(f"Chromosome:{i-1}      Score:{score}")
+    print(f"Average score: {score_sum / POPULATION_SIZE}")
+    
 def print_stats(population: list[Schedule]) -> None:
     i: int = 0
     score_sum: int = 0
     for chromosome in population:
         score = optimal_criterion(chromosome)
-        print(f"Chromosome:{i} Score:{score}")
         score_sum += score
         i += 1
-    print(f"Average:{score_sum / POPULATION_SIZE}")
-    
+    print(f"Average score: {score_sum / POPULATION_SIZE}")
+    best_schedule = population[0]
+    best_score = optimal_criterion(best_schedule)
+    for chromosome in population:
+        if optimal_criterion(chromosome) > best_score:
+            best_schedule = chromosome
+            best_score = optimal_criterion(chromosome)
+    print(f"Best score: {best_score}.")
 
 def main() -> None:
-    rooms, lessons = read_file("./ata_timetable.txt")
+    rooms, lessons = read_file("./data_timetable.txt")
     globals.lesson_count = len(lessons)
 
     population: list[Schedule] = generate_population(rooms, lessons)
     
     print("Start population:")
-    print_stats(population)
+    print_all_stats(population)
 
     p = time()
     it = 1
@@ -47,6 +76,11 @@ def main() -> None:
         children = crossover(parents)
         mutate(children)
         population = elitism(population, children)
+        
+        if PRINT_GENERATIONS and it%10 == 0:
+            print(f"Generation {it}")
+            print_stats(population)
+            print()
 
         it += 1
 
@@ -58,7 +92,7 @@ def main() -> None:
             best_score = optimal_criterion(chromosome)
     
     print("\nNew population")
-    print_stats(population)
+    print_all_stats(population)
     print(f"Best schedule: \n{best_schedule}")
     print(f"Best score: {best_score}.")
     print(f"Program took {time()-p} seconds.")
