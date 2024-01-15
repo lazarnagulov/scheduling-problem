@@ -19,7 +19,7 @@ NAiNS - Predavanje, 180
 ```
 
 ## Configuration
-You can customize the algorithm by adjusting constants in the ```./common/constants.py``` file. 
+You can customize the algorithm by adjusting constants in the ```./common/constants.py``` (and ```./main.py```) file. 
 The default values are:
 ```python
 POPULATION_SIZE = 600
@@ -27,6 +27,10 @@ MUTATION_RATE = 0.2
 MUTATION_WIDTH = 6
 GENERATIONS = 100
 ELITISM_RATE = 0.01
+# Set value to -1 to go through all generations.
+BEST_STREAK_TO_EXIT_ON = 20
+# main.py
+PRINT_GENERATIONS = True
 ```
 Feel free to experiment with these values to observe different behaviors of the genetic algorithm.
 
