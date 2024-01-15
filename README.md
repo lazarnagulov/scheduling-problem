@@ -6,8 +6,7 @@ This repository contains an implementation of a genetic algorithm to solve the S
 python3 ./main.py
 ```
 ## Data
-All input data required for the algorithm is stored in the ```./data_timetable.txt file. ```
-
+All input data required for the algorithm is stored in the ```./data_timetable.txt``` file.
 An example of the data file format is provided below:
 ```txt
 rooms: A, B, C, D, E
@@ -20,7 +19,8 @@ NAiNS - Predavanje, 180
 ```
 
 ## Configuration
-You can customize the algorithm by adjusting constants in the ./common/constants.py file. The default values are:
+You can customize the algorithm by adjusting constants in the ```./common/constants.py``` file. 
+The default values are:
 ```python
 POPULATION_SIZE = 600
 MUTATION_RATE = 0.2

@@ -42,7 +42,7 @@ def main() -> None:
     p = time()
     it = 1
     
-    for _ in range(GENERATIONS): # Genetic algorihm
+    for _ in range(GENERATIONS):
         parents = roulette_selection(population)
         children = crossover(parents)
         mutate(children)
