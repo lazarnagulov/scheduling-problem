@@ -10,3 +10,6 @@ ELITISM_RATE = 0.01
 START_TIME = 7 * 60
 END_TIME = 19 * 60
 MAX_TIME = END_TIME - START_TIME
+
+# Set value to -1 to go through all generations.
+BEST_STREAK_TO_EXIT_ON = 20
