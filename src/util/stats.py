@@ -49,7 +49,7 @@ def print_stats(population: list[Schedule]) -> None:
     best_schedule, best_score = find_best(population)
     print(f"Best score: {best_score}.")
 
-def find_best(population: list[Schedule]) -> tuple[Schedule, float]:
+def find_best(population: list[Schedule]) -> tuple[Schedule, int]:
     from genetics.genetics import optimal_criterion
     best_schedule = population[0]
     best_score = optimal_criterion(best_schedule)

@@ -2,7 +2,7 @@ from model.lesson import Lesson
 from model.schedule import Schedule
 from model.day import Day
 from model.classroom import Classroom
-from common import globals
+from common.globals import lesson_count
 from time import time
 
 from common.constants import *
@@ -112,11 +112,12 @@ def optimal_criterion(schedule: Schedule) -> int:
     return score
 
 def crossover(parents: list[tuple[Schedule, Schedule]]):
+    global lesson_count
     children = []
     for pair in parents:
         parent_0 = deepcopy(pair[0])
         parent_1 = deepcopy(pair[1])
-        to_cross = globals.lesson_count // 2
+        to_cross = lesson_count // 2
         for _ in range(to_cross):
             day_0 = random.choice(parent_0.days)
             old_classroom_0 = random.choice(day_0.classrooms)
@@ -191,7 +192,7 @@ def mutate(population: list[Schedule]) -> None:
                     chromosome.lesson_map[lesson_A] = (day_B, classroom_B)
 
 def roulette_selection(population: list[Schedule]) -> list[tuple[Schedule,Schedule]]: 
-    weights: list[int, list[Day]] = []
+    weights: list[tuple[float, Schedule]] = []
     scores = [optimal_criterion(chromosome) for chromosome in population]
     parents = []
     for _ in range(0, len(population), 2):
@@ -214,5 +215,5 @@ def __find_classroom(schedule: Schedule, day_name: str, classroom_name: str) -> 
             for classroom in day.classrooms:
                 if classroom.name == classroom_name:
                     return classroom 
-                
-            
+    
+    raise Exception("Unreachable...")            
