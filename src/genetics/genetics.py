@@ -13,7 +13,7 @@ import random
 
 def run() -> None:
     global lesson_count
-    rooms, lessons = file_handler.read_file("./data_timetable.txt")
+    rooms, lessons = file_handler.read_file(TEST_DATA_FILE)
     lesson_count = len(lessons)
     population: list[Schedule] = generate_population(rooms, lessons)
     
