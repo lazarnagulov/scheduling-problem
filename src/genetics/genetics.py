@@ -1,8 +1,57 @@
-from model.model import *
+from model.lesson import Lesson
+from model.schedule import Schedule
+from model.day import Day
+from model.classroom import Classroom
+from common.globals import lesson_count
+from time import time
+
 from common.constants import *
-from common import globals
+from util import file_handler, stats
+
 from copy import deepcopy
 import random
+
+def run() -> None:
+    global lesson_count
+    rooms, lessons = file_handler.read_file(TEST_DATA_FILE)
+    lesson_count = len(lessons)
+    population: list[Schedule] = generate_population(rooms, lessons)
+    
+    print("Start population:")
+    stats.print_all_stats(population)
+    start_time: float = time()
+    population = run_generation(population, 1)
+    stats.print_final_results(population, start_time)
+    
+def run_generation(population: list[Schedule], iteration: int) -> list[Schedule]:
+    prev_best_score: int = 0
+    best_score: int = 0
+    same: int = 1
+
+    for _ in range(GENERATIONS):
+        parents: list[tuple[Schedule, Schedule]] = roulette_selection(population)
+        children: list[Schedule] = crossover(parents)
+        mutate(children)
+        population = elitism(population, children)
+
+        if BEST_STREAK_TO_EXIT_ON != -1:
+            prev_best_score, best_score = best_score, stats.find_best(population)[1]
+            if prev_best_score == best_score:
+                same += 1
+            else:
+                same = 1
+            if same == BEST_STREAK_TO_EXIT_ON:
+                print(f"Exiting on iteration {iteration}...")
+                break
+
+        if PRINT_GENERATIONS and iteration%10 == 0:
+            print(f"Generation {iteration}")
+            stats.print_stats(population)
+            print()
+
+        iteration += 1
+        
+    return population
 
 def generate_population(classrooms: list[str], lessons: list[Lesson]) -> list[Schedule]:
     random.shuffle(lessons)
@@ -62,12 +111,13 @@ def optimal_criterion(schedule: Schedule) -> int:
                 score += (classroom.start_time - START_TIME) * (END_TIME - end_time)
     return score
 
-def crossover(parents: list[tuple[Schedule, Schedule]]):
-    children = []
+def crossover(parents: list[tuple[Schedule, Schedule]]) -> list[Schedule]:
+    global lesson_count
+    children: list[Schedule] = []
     for pair in parents:
         parent_0 = deepcopy(pair[0])
         parent_1 = deepcopy(pair[1])
-        to_cross = globals.lesson_count // 2
+        to_cross = lesson_count // 2
         for _ in range(to_cross):
             day_0 = random.choice(parent_0.days)
             old_classroom_0 = random.choice(day_0.classrooms)
@@ -101,25 +151,6 @@ def crossover(parents: list[tuple[Schedule, Schedule]]):
         children.append(parent_1)
             
     return children
-
-
-# pair[0]:
-#     classroom U:  lesson_A E F
-#     classroom X:  O P R
-#
-# pair[1]:
-#     classroom U:  C D G
-#     classroom X:  K L lesson_A
-#
-#
-# child:
-#     classroom U:  E F
-#     classroom X:  O P R lesson_A
-#
-# child:
-#     classroom U:  C D G lesson_A 
-#     classroom X:  K L 
-
 
 def mutate(population: list[Schedule]) -> None:
     for chromosome in population:
@@ -161,9 +192,9 @@ def mutate(population: list[Schedule]) -> None:
                     chromosome.lesson_map[lesson_A] = (day_B, classroom_B)
 
 def roulette_selection(population: list[Schedule]) -> list[tuple[Schedule,Schedule]]: 
-    weights: list[int, list[Day]] = []
-    scores = [optimal_criterion(chromosome) for chromosome in population]
-    parents = []
+    weights: list[tuple[float, Schedule]] = []
+    scores: list[int] = [optimal_criterion(chromosome) for chromosome in population]
+    parents: list[tuple[Schedule, Schedule]] = []
     for _ in range(0, len(population), 2):
         weights = []
         for i in range(len(population)):
@@ -175,7 +206,7 @@ def roulette_selection(population: list[Schedule]) -> list[tuple[Schedule,Schedu
 def elitism(population: list[Schedule], children: list[Schedule]) -> list[Schedule]:
     population = sorted(population, key = optimal_criterion, reverse=True)
     children = sorted(children, key = optimal_criterion, reverse=True)
-    elitism_size = int(round(POPULATION_SIZE * ELITISM_RATE))
+    elitism_size: int = int(round(POPULATION_SIZE * ELITISM_RATE))
     return population[:elitism_size] + children[:(POPULATION_SIZE - elitism_size)]
 
 def __find_classroom(schedule: Schedule, day_name: str, classroom_name: str) -> Classroom:
@@ -184,3 +215,5 @@ def __find_classroom(schedule: Schedule, day_name: str, classroom_name: str) -> 
             for classroom in day.classrooms:
                 if classroom.name == classroom_name:
                     return classroom 
+    
+    raise Exception("Unreachable...")            

@@ -1,12 +1,16 @@
 # Scheduling Problem Implementation using Genetic Algorithm
-## Overview
-This repository contains an implementation of a genetic algorithm to solve the Scheduling Problem. The solution is written in Python and can be executed by running the following command:
+Project for Nonlinear Programming and Evolutionary Algorithms course.
 
-```bash
+Revisited and updated 10.9.2024.
+## Overview
+This repository contains an implementation of a genetic algorithm to solve the Scheduling Problem. The solution is written in Python and can be executed by running the following commands:
+
+```
+cd ./src
 python3 ./main.py
 ```
 ## Data
-All input data required for the algorithm is stored in the ```./data_timetable.txt``` file.
+All input data required for the algorithm is stored in the ```data_timetable.txt``` file.
 An example of the data file format is provided below:
 ```txt
 rooms: A, B, C, D, E
