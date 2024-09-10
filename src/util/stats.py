@@ -4,7 +4,6 @@ from model.schedule import Schedule
 from time import time
 
 def print_final_results(population: list[Schedule], start_time: float) -> None:
-    """Prints the final results after the algorithm has completed."""
     best_schedule, best_score = find_best(population)
     
     print("\nNew population")
@@ -46,7 +45,7 @@ def print_stats(population: list[Schedule]) -> None:
         score_sum += score
         i += 1
     print(f"Average score: {score_sum / POPULATION_SIZE}")
-    best_schedule, best_score = find_best(population)
+    _, best_score = find_best(population)
     print(f"Best score: {best_score}.")
 
 def find_best(population: list[Schedule]) -> tuple[Schedule, int]:
