@@ -1,8 +1,20 @@
-from model.schedule import Schedule
-from genetics.genetics import optimal_criterion
 from common.constants import POPULATION_SIZE
+from model.schedule import Schedule
+
+from time import time
+
+def print_final_results(population: list[Schedule], start_time: float) -> None:
+    """Prints the final results after the algorithm has completed."""
+    best_schedule, best_score = find_best(population)
+    
+    print("\nNew population")
+    print_all_stats(population)
+    print(f"Best schedule: \n{best_schedule}")
+    print(f"Best score: {best_score}.")
+    print(f"Program took {time() - start_time} seconds.")
 
 def print_all_stats(population: list[Schedule]) -> None:
+    from genetics.genetics import optimal_criterion
     i: int = 0
     score_sum: int = 0
     same: int = 0
@@ -26,6 +38,7 @@ def print_all_stats(population: list[Schedule]) -> None:
     print(f"Average score: {score_sum / POPULATION_SIZE}")
     
 def print_stats(population: list[Schedule]) -> None:
+    from genetics.genetics import optimal_criterion
     i: int = 0
     score_sum: int = 0
     for chromosome in population:
@@ -37,6 +50,7 @@ def print_stats(population: list[Schedule]) -> None:
     print(f"Best score: {best_score}.")
 
 def find_best(population: list[Schedule]) -> tuple[Schedule, float]:
+    from genetics.genetics import optimal_criterion
     best_schedule = population[0]
     best_score = optimal_criterion(best_schedule)
     for chromosome in population:

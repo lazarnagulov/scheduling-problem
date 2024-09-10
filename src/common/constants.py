@@ -13,3 +13,5 @@ MAX_TIME = END_TIME - START_TIME
 
 # Set value to -1 to go through all generations.
 BEST_STREAK_TO_EXIT_ON = 20
+
+PRINT_GENERATIONS = True

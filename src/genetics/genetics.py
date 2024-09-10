@@ -2,10 +2,56 @@ from model.lesson import Lesson
 from model.schedule import Schedule
 from model.day import Day
 from model.classroom import Classroom
-from common.constants import *
 from common import globals
+from time import time
+
+from common.constants import *
+from util import file_handler, stats
+
 from copy import deepcopy
 import random
+
+def run() -> None:
+    global lesson_count
+    rooms, lessons = file_handler.read_file("./data_timetable.txt")
+    lesson_count = len(lessons)
+    population: list[Schedule] = generate_population(rooms, lessons)
+    
+    print("Start population:")
+    stats.print_all_stats(population)
+    start_time = time()
+    population = run_generation(population, 1)
+    stats.print_final_results(population, start_time)
+    
+def run_generation(population: list[Schedule], iteration: int) -> list[Schedule]:
+    prev_best_score = 0
+    best_score = 0
+    same = 1
+
+    for _ in range(GENERATIONS):
+        parents = roulette_selection(population)
+        children = crossover(parents)
+        mutate(children)
+        population = elitism(population, children)
+
+        if BEST_STREAK_TO_EXIT_ON != -1:
+            prev_best_score, best_score = best_score, stats.find_best(population)[1]
+            if prev_best_score == best_score:
+                same += 1
+            else:
+                same = 1
+            if same == BEST_STREAK_TO_EXIT_ON:
+                print(f"Exiting on iteration {iteration}...")
+                break
+
+        if PRINT_GENERATIONS and iteration%10 == 0:
+            print(f"Generation {iteration}")
+            stats.print_stats(population)
+            print()
+
+        iteration += 1
+        
+    return population
 
 def generate_population(classrooms: list[str], lessons: list[Lesson]) -> list[Schedule]:
     random.shuffle(lessons)
@@ -105,25 +151,6 @@ def crossover(parents: list[tuple[Schedule, Schedule]]):
             
     return children
 
-
-# pair[0]:
-#     classroom U:  lesson_A E F
-#     classroom X:  O P R
-#
-# pair[1]:
-#     classroom U:  C D G
-#     classroom X:  K L lesson_A
-#
-#
-# child:
-#     classroom U:  E F
-#     classroom X:  O P R lesson_A
-#
-# child:
-#     classroom U:  C D G lesson_A 
-#     classroom X:  K L 
-
-
 def mutate(population: list[Schedule]) -> None:
     for chromosome in population:
         chance = random.random()
@@ -187,3 +214,5 @@ def __find_classroom(schedule: Schedule, day_name: str, classroom_name: str) -> 
             for classroom in day.classrooms:
                 if classroom.name == classroom_name:
                     return classroom 
+                
+            
