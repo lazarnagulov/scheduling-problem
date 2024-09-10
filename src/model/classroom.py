@@ -1,16 +1,7 @@
 from dataclasses import dataclass
 from common.constants import *
 
-@dataclass
-class Lesson:
-    subject: str
-    length: int
-    
-    def __str__(self) -> str:
-        return "    " + self.subject + " [" + str(self.length) + " min]"
-    
-    def __hash__(self) -> int:
-        return hash(self.subject)
+from .lesson import Lesson
 
 @dataclass
 class Classroom:
@@ -46,26 +37,3 @@ class Classroom:
         else:
             self.total_time += lesson.length + BREAK
         self.start_time = START_TIME + (MAX_TIME - self.total_time) // 2
-    
-
-@dataclass
-class Day:
-    name: str
-    classrooms: list[Classroom]
-    
-    def __str__(self) -> str:
-        string = self.name + ": \n"
-        for cr in self.classrooms:
-            string += str(cr) + '\n'
-        return string
-
-@dataclass
-class Schedule:
-    lesson_map: dict[Lesson,tuple[Day,Classroom]]
-    days: list[Day]
-    
-    def __str__(self) -> str:
-        string = ""
-        for day in self.days:
-            string += str(day) + '\n'
-        return string
